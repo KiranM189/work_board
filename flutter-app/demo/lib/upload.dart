@@ -16,11 +16,10 @@ class PageUpload extends StatefulWidget {
 class _PageUploadState extends State<PageUpload> {
   File? _selectedImage;
   File? _uploadedImage;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: SingleChildScrollView(child: Column(
         children: [
           if (_selectedImage != null)
             Column(
@@ -28,13 +27,7 @@ class _PageUploadState extends State<PageUpload> {
                 if(_uploadedImage != null)
                   Image.file(_uploadedImage!)
                 else
-                  Column(
-                  children: [Image.file(_selectedImage!), ElevatedButton(
-                    onPressed: () => _uploadImage(_selectedImage!),
-                    child: const Text('Upload Image'),
-                    )],
-                  ),
-                
+                  Image.file(_selectedImage!)
               ],
             )
           else
@@ -45,7 +38,8 @@ class _PageUploadState extends State<PageUpload> {
               ),
             ),
         ],
-      ),
+      )
+      )
     );
   }
 
@@ -55,10 +49,11 @@ class _PageUploadState extends State<PageUpload> {
     setState(() {
       _selectedImage = File(returnedImage.path);
     });
+    _uploadImage(_selectedImage!);  
   }
 
   Future<void> _uploadImage(File image) async {
-    String uploadUrl = 'http://10.0.2.2:5000/upload'; // Use emulator-specific address
+    String uploadUrl = 'http://172.16.128.85:5000/upload'; // Use emulator-specific address
 
     final mimeTypeData = lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
 
@@ -76,7 +71,8 @@ class _PageUploadState extends State<PageUpload> {
       final response = await http.Response.fromStream(streamedResponse);
       if (response.statusCode == 200) {
         print('Image uploaded successfully');
-         final tempDir = await getTemporaryDirectory();
+
+         final tempDir = await getApplicationDocumentsDirectory();
         final tempFile = File('${tempDir.path}/uploaded_image.jpg');
         debugPrint(tempDir.path);
         await tempFile.writeAsBytes(response.bodyBytes);
