@@ -30,7 +30,7 @@ class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
     super.key,
     required this.camera,
-  });
+  });   
 
   final CameraDescription camera;
 
@@ -134,7 +134,7 @@ class DisplayPictureScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Display the Picture')),
       // The image is stored as a file on the device. Use the Image.file
       // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
+      body: Center(child: Image.file(File(imagePath))),
     );
   }
 }

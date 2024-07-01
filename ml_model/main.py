@@ -32,11 +32,10 @@ def main(input_path, output_path, api_key):
             y1 = int(i.y - i.height / 2)
             x2 = int(i.x + i.width / 2)
             y2 = int(i.y + i.height / 2)
-            print("Oval")
-            cv2.rectangle(enhanced_image, (x1, y1), (x2, y2), (255,255,255), thickness=-1)
-            cv2.ellipse(enhanced_image, (center_x, center_y), (width // 2, height // 2), 0, 0, 360,(255,255,255), thickness=-1)
-            cv2.ellipse(enhanced_image, (center_x, center_y), (width // 2, height // 2), 0, 0, 360,(0,0,0), thickness=1)
-        if i.class_name == "rectangle":
+            cv2.rectangle(enhanced_image, (x1, y1), (x2, y2), (255, 255, 255), thickness=-1)
+            cv2.ellipse(enhanced_image, (center_x, center_y), (width // 2, height // 2), 0, 0, 360, (255, 255, 255), thickness=-1)
+            cv2.ellipse(enhanced_image, (center_x, center_y), (width // 2, height // 2), 0, 0, 360, (0, 0, 0), thickness=2)
+        elif i.class_name == "rectangle":
             x1 = int(i.x - i.width / 2)
             y1 = int(i.y - i.height / 2)
             x2 = int(i.x + i.width / 2)
@@ -68,6 +67,7 @@ def main(input_path, output_path, api_key):
             generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
             print(generated_text)
     
+    # Save the enhanced image to the output path
     cv2.imwrite(output_path, enhanced_image)
 
 if __name__ == "__main__":

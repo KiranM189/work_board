@@ -5,6 +5,10 @@ const child_process = require('child_process');
 
 const app = express();
 
+app.listen(5000, '0.0.0.0', () => {
+    console.log(`Server is running on http://0.0.0.0`);
+  });
+
 app.use(express.urlencoded({ extended: false }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -29,10 +33,10 @@ app.post('/upload', upload.single("image"), (req, res) => {
     console.log(req.body);
 
     const inputPath = path.join(__dirname, 'uploads', req.file.filename);
-    const outputPath = path.join(__dirname, 'uploads', `processed-${req.file.filename}`);
-
+    const outputPath = path.join(__dirname, 'processed_images', `processed-${req.file.filename}`);
+    const file_path=path.join(__dirname,'..\\ml_model\\main.py');
     const pythonProcess = child_process.spawn('python', [
-        path.join(__dirname, '..\\work_board\\main.py'),
+        file_path,
         inputPath,
         outputPath,
         'W3qPqcMolWonRsfEjphV'  // Pass the API key as an argument
@@ -57,6 +61,5 @@ app.post('/upload', upload.single("image"), (req, res) => {
     });
 });
 
-app.listen(5000, () => {
-    console.log("listening on port 5000");
-});
+
+  
