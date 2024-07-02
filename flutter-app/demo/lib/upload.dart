@@ -53,7 +53,7 @@ class _PageUploadState extends State<PageUpload> {
   }
 
   Future<void> _uploadImage(File image) async {
-    String uploadUrl = 'http://172.16.128.85:5000/upload'; // Use emulator-specific address
+    String uploadUrl = 'http://10.0.2.2:5000/upload'; // Use emulator-specific address
 
     final mimeTypeData = lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
 

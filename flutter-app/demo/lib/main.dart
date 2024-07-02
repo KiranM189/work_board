@@ -38,7 +38,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home Page"),
@@ -58,7 +57,7 @@ class _HomePageState extends State<HomePage> {
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Badge(child: Icon(Icons.image_search)),
+            icon: Badge(child: Icon(Icons.browse_gallery)),
             label: 'Search Gallery',
           ),
           NavigationDestination(
@@ -68,9 +67,9 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: <Widget>[
-        DefaultPage(theme: theme),
+        const DefaultPage(),
         const PageUpload(),
-        TakePictureScreen(camera: widget.camera),
+        const CameraUpload(),
       ][currentPageIndex],
     );
   }
