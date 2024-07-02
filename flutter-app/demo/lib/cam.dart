@@ -63,7 +63,7 @@ class _CameraUploadState extends State<CameraUpload> {
       image.path,
       contentType: MediaType(mimeTypeData![0], mimeTypeData[1]), // Use MediaType from http_parser
     );
-
+    String imageName = image.path.split('/').last;
     imageUploadRequest.files.add(file);
 
     try {
@@ -72,8 +72,8 @@ class _CameraUploadState extends State<CameraUpload> {
       if (response.statusCode == 200) {
         print('Image uploaded successfully');
 
-         final tempDir = await getApplicationDocumentsDirectory();
-        final tempFile = File('${tempDir.path}/uploaded_image.jpg');
+        final tempDir = await getApplicationDocumentsDirectory();
+        final tempFile = File('${tempDir.path}/$imageName.jpg');
         debugPrint(tempDir.path);
         await tempFile.writeAsBytes(response.bodyBytes);
         setState(() {
