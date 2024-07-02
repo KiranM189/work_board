@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: <Widget>[
         DefaultPage(theme: theme),
-        PageUpload(),
+        const PageUpload(),
         TakePictureScreen(camera: widget.camera),
       ][currentPageIndex],
     );

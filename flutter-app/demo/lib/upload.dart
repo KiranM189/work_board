@@ -7,7 +7,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:path_provider/path_provider.dart';
 
 class PageUpload extends StatefulWidget {
-  PageUpload({super.key});
+  const PageUpload({super.key});
 
   @override
   _PageUploadState createState() => _PageUploadState();
