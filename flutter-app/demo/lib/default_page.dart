@@ -53,14 +53,17 @@ class _DefaultPageState extends State<DefaultPage> {
           } else {
             var imageList = snapshot.data!;
             return ListView.builder(
+              
               itemCount: imageList.length,
               itemBuilder: (context, index) {
                 File file = File(imageList[index].path);
+                String imageName = file.path.split('/').last; // Get the image name
+                String imageDateTime = file.lastModifiedSync().toString(); // Get the last modified date and time
                 return Card(
                   child: ListTile(
                     leading: Image.file(file, width: 50, height: 50, fit: BoxFit.cover),
-                    title: const Text('Two-line ListTile'),
-                    subtitle: const Text('Here is a second line'),
+                    title: Text(imageName),
+                    subtitle: Text(imageDateTime),
                   ),
                 );
               },
