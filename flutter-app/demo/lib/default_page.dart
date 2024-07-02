@@ -1,21 +1,8 @@
 import 'dart:io';
+import 'package:demo/display.dart';
 import 'package:flutter/material.dart';
 // import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-
-void main() => runApp(const MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(useMaterial3: true),
-      home: const DefaultPage(),
-    );
-  }
-}
 
 class DefaultPage extends StatefulWidget {
   const DefaultPage({super.key});
@@ -52,8 +39,7 @@ class _DefaultPageState extends State<DefaultPage> {
             return const Center(child: Text('No images found'));
           } else {
             var imageList = snapshot.data!;
-            return ListView.builder(
-              
+            return ListView.builder(              
               itemCount: imageList.length,
               itemBuilder: (context, index) {
                 File file = File(imageList[index].path);
@@ -64,6 +50,10 @@ class _DefaultPageState extends State<DefaultPage> {
                     leading: Image.file(file, width: 50, height: 50, fit: BoxFit.cover),
                     title: Text(imageName),
                     subtitle: Text(imageDateTime),
+                    trailing: const Icon(Icons.more_vert),
+                    onTap: () => { 
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => ImageDisplay(image: Image.file(file))))
+      }
                   ),
                 );
               },

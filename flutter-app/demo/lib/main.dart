@@ -1,33 +1,27 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/upload.dart';
 import 'package:demo/default_page.dart';
 import 'package:demo/cam.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  final cameras = await availableCameras();
-  final firstCamera = cameras.first;
-  runApp(MyApp(camera: firstCamera));
+void main(){
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final CameraDescription camera;
-  const MyApp({super.key, required this.camera});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(useMaterial3: true),
-      home: HomePage(camera: camera),
+      home: const HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  final CameraDescription camera;
-  const HomePage({super.key, required this.camera});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
