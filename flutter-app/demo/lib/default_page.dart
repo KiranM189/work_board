@@ -27,7 +27,11 @@ class _DefaultPageState extends State<DefaultPage> {
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+        
+    });
     return Scaffold(
+      
       body: FutureBuilder<List<FileSystemEntity>>(
         future: _imageListFuture,
         builder: (context, snapshot) {
@@ -52,8 +56,8 @@ class _DefaultPageState extends State<DefaultPage> {
                     subtitle: Text(imageDateTime),
                     trailing: const Icon(Icons.more_vert),
                     onTap: () => { 
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => ImageDisplay(image: Image.file(file))))
-      }
+                         Navigator.push(context, MaterialPageRoute(builder: (context) => ImageDisplay(image_path: imageList[index].path)))
+                    }
                   ),
                 );
               },
