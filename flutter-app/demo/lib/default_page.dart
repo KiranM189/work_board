@@ -32,7 +32,7 @@ class _DefaultPageState extends State<DefaultPage> {
     });
     return Scaffold(
       
-      body: FutureBuilder<List<FileSystemEntity>>(
+      body: SingleChildScrollView(child: FutureBuilder<List<FileSystemEntity>>(
         future: _imageListFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -64,6 +64,7 @@ class _DefaultPageState extends State<DefaultPage> {
             );
           }
         },
+      ),
       ),
     );
   }
