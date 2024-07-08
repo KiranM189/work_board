@@ -1,18 +1,24 @@
 import 'dart:io';
 import 'package:demo/display.dart';
+import 'package:demo/upload.dart';
 import 'package:flutter/material.dart';
-// import 'package:path/path.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 class DefaultPage extends StatefulWidget {
   const DefaultPage({super.key});
 
   @override
-  _DefaultPageState createState() => _DefaultPageState();
+  DefaultPageState createState() => DefaultPageState();
 }
 
-class _DefaultPageState extends State<DefaultPage> {
+class DefaultPageState extends State<DefaultPage> {
   late Future<List<FileSystemEntity>> _imageListFuture;
+  late File? selectedImage;
+  late File? enhancedImage;
 
   @override
   void initState() {
@@ -25,14 +31,72 @@ class _DefaultPageState extends State<DefaultPage> {
     return directory.listSync().where((item) => item.path.endsWith('.jpg')).toList();
   }
 
+  Future<void> _pickImage(ImageSource src) async {
+    final returnedImage = await ImagePicker().pickImage(source: src);
+    if (returnedImage == null) return;
+    selectedImage = File(returnedImage.path);
+    if (!mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LoadingPage(imagePath: selectedImage!)),
+    );
+
+    await _uploadImage(selectedImage!);
+
+    
+    if (mounted) {
+      Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
+    }
+  }
+
+  Future<void> _uploadImage(File image) async {
+    String uploadUrl = 'http://172.16.128.43:5000/upload';
+
+    final mimeTypeData = lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
+
+    final imageUploadRequest = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+    final file = await http.MultipartFile.fromPath(
+      'image',
+      image.path,
+      contentType: MediaType(mimeTypeData![0], mimeTypeData[1]), // Use MediaType from http_parser
+    );
+    String imageName = image.path.split('/').last;
+
+    imageUploadRequest.files.add(file);
+
+    try {
+      final streamedResponse = await imageUploadRequest.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode == 200) {
+        debugPrint('Image uploaded successfully');
+
+        final tempDir = await getApplicationDocumentsDirectory();
+        final path = '${tempDir.path}/$imageName.jpg';
+        final tempFile = File(path);
+        debugPrint(tempDir.path);
+        await tempFile.writeAsBytes(response.bodyBytes);
+        enhancedImage = File(path);
+      } else {
+        debugPrint('Image upload failed with status code ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error uploading image: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    setState(() {
-        
-    });
+    setState(() {});
     return Scaffold(
-      
-      body: SingleChildScrollView(child: FutureBuilder<List<FileSystemEntity>>(
+      appBar: AppBar(
+        title: const Text("WorkBoard",
+          style: TextStyle(
+            fontFamily: 'Monospace'
+          )),
+        backgroundColor: const Color.fromARGB(255, 12, 12, 12)
+      ),
+      body: FutureBuilder<List<FileSystemEntity>>(
         future: _imageListFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -43,28 +107,70 @@ class _DefaultPageState extends State<DefaultPage> {
             return const Center(child: Text('No images found'));
           } else {
             var imageList = snapshot.data!;
-            return ListView.builder(              
+            return ListView.separated(
               itemCount: imageList.length,
               itemBuilder: (context, index) {
                 File file = File(imageList[index].path);
-                String imageName = file.path.split('/').last; // Get the image name
-                String imageDateTime = file.lastModifiedSync().toString(); // Get the last modified date and time
+                String imageName = file.path.split('/').last.split('.').first;
+                String imageDateTime = file.lastModifiedSync().toLocal().toString().split('.').first.split('.').first;
                 return Card(
                   child: ListTile(
-                    leading: Image.file(file, width: 50, height: 50, fit: BoxFit.cover),
-                    title: Text(imageName),
-                    subtitle: Text(imageDateTime),
-                    trailing: const Icon(Icons.more_vert),
-                    onTap: () => { 
-                         Navigator.push(context, MaterialPageRoute(builder: (context) => ImageDisplay(image_path: imageList[index].path)))
-                    }
+                    leading: Image.file(file, width: 75, height: 75, fit: BoxFit.fill),
+                    title: Text(imageName,
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16.0
+                      )),
+                    subtitle: Text(imageDateTime,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.normal,
+                        fontSize: 12.0
+                      )),
+                    onTap: () => {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ImageDisplay(image_path: imageList[index].path)),
+                      )
+                    },
                   ),
                 );
               },
+              separatorBuilder: (BuildContext context, int index) => const Divider(
+                color: Colors.black,
+                thickness: 1.5,
+              ),
             );
           }
         },
       ),
+      bottomNavigationBar: BottomAppBar(
+        color: const Color.fromARGB(255, 12, 12, 12),
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 6.0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.home_rounded),
+                onPressed: () => const DefaultPage(),
+              ),
+              IconButton(
+                icon: const Icon(Icons.collections_rounded),
+                onPressed: () => _pickImage(ImageSource.gallery),
+              ),
+              IconButton(
+                icon: const Icon(Icons.photo_camera),
+                onPressed: () => _pickImage(ImageSource.camera),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

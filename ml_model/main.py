@@ -9,7 +9,6 @@ def main(input_path, output_path, api_key):
     # Load models
     processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
     model1 = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")
-    
     # Read image
     img = cv2.imread(input_path)
     if img is None:
@@ -66,7 +65,6 @@ def main(input_path, output_path, api_key):
             generated_ids = model1.generate(pixel_values)
             generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
             print(generated_text)
-    
     # Save the enhanced image to the output path
     cv2.imwrite(output_path, enhanced_image)
 
