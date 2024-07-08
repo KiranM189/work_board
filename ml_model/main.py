@@ -1,5 +1,5 @@
 from inference import get_model
-import image_enhance
+import ml_model.image_enhancer as image_enhancer
 import cv2
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 import requests
@@ -12,7 +12,7 @@ model123 = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handw
 YOUR_API_KEY = "W3qPqcMolWonRsfEjphV"
 model = get_model(model_id="handwrittenv2/2", api_key=YOUR_API_KEY)
 imgg = cv2.imread("52.png")
-enim = image_enhance.whiteboard_enhance(imgg)
+enim = image_enhancer.whiteboard_enhance(imgg)
 results = model.infer(enim)
 
 para=0
