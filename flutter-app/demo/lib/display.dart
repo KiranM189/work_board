@@ -1,29 +1,51 @@
 // ignore_for_file: non_constant_identifier_names
-
 import 'dart:io';
 import 'package:demo/default_page.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as p;
 import 'package:share_plus/share_plus.dart';
-class ImageDisplay extends StatelessWidget {
+import 'package:path/path.dart' as p;
+
+class ImageDisplay extends StatefulWidget {
   final String image_path;
   ImageDisplay({super.key, required this.image_path});
   final TextEditingController rename_text=TextEditingController();
 
   @override
+  State<ImageDisplay> createState() => _ImageDisplayState();
+}
+
+class _ImageDisplayState extends State<ImageDisplay> {
+  var select = 1;
+
+  @override
   Widget build(BuildContext context) {
-    File file = File(image_path);
+    // ignore: prefer_typing_uninitialized_variables
+    
+    var paths = [widget.image_path, widget.image_path];
+    if(widget.image_path.contains('original'))
+    {
+      paths[0] = widget.image_path;
+      paths[1] = paths[0].replaceFirst('original', 'enhanced');
+    }
+    else
+    {
+      paths[1] = widget.image_path;
+      paths[0] = paths[1].replaceFirst('enhanced', 'original');
+    }
+    File originalFile = File(paths[0]);
+    File enhancedFile = File(paths[1]);
+
     final snackBar = SnackBar(
       content: const Text('Image Deleted!'),
       action: SnackBarAction(
-        label: 'UNDO',
+        label: 'Undo',
         onPressed: () => {
           Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst)),
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DefaultPage()))
         }));
     return Scaffold(
       appBar: AppBar(
-        title: Text(image_path.split('/').last.split('.').first,
+        title: Text(widget.image_path.split('/').last.split('.').first,
           style: const TextStyle(
             fontFamily: 'Monospace',
             fontSize: 16.0
@@ -44,7 +66,7 @@ class ImageDisplay extends StatelessWidget {
                         Text("Share")
                       ]
                     ),
-                    onTap: ()=> {Share.shareXFiles([XFile(image_path)])},
+                    onTap: ()=> {Share.shareXFiles([XFile(paths[select])])},
                   ),
                   PopupMenuItem(
                     value: 2,
@@ -63,7 +85,7 @@ class ImageDisplay extends StatelessWidget {
                         builder: (BuildContext context) => AlertDialog(
                           title: const Text('Rename the file'),
                             content: TextField(
-                              controller: rename_text,
+                              controller: widget.rename_text,
                             ),
                           actions: <Widget>[
                             TextButton(
@@ -72,8 +94,12 @@ class ImageDisplay extends StatelessWidget {
                             ),
                             TextButton(
                               onPressed: () {
-                                String rename_dir="${p.dirname(image_path)}/${rename_text.text}.jpg";
-                                file.rename(rename_dir);
+                                String rename_dir="${p.dirname(paths[1])}/${widget.rename_text.text}.jpg";
+                                enhancedFile.rename(rename_dir);
+                                debugPrint(rename_dir);
+                                rename_dir="${p.dirname(paths[0])}/${widget.rename_text.text}.jpg";
+                                originalFile.rename(rename_dir);
+                                debugPrint(rename_dir);
                                 Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
                                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
                               },
@@ -96,7 +122,7 @@ class ImageDisplay extends StatelessWidget {
                       ]
                     ),
                     onTap: () {
-                      File(image_path).delete();
+                      File(widget.image_path).delete();
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
@@ -106,8 +132,25 @@ class ImageDisplay extends StatelessWidget {
               ),
         ]
       ),
-      body: Center(child: Image.file(file)),
+      body: Center(child: Image.file(File(paths[select]))),
+      bottomNavigationBar: SegmentedButton<int>(
+        segments: const[
+          ButtonSegment(
+            value: 0,
+            label: Text('Original')
+          ),
+          ButtonSegment(
+            value: 1,
+            label: Text('Enhanced')
+          )
+        ],
+        selected: {select},
+        onSelectionChanged: (selection) {
+          setState(() => 
+            select = selection.first
+          );
+        },
+      ),
     );
-
   }
 }
