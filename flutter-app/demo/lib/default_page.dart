@@ -27,7 +27,8 @@ class DefaultPageState extends State<DefaultPage> {
   }
 
   Future<List<FileSystemEntity>> _loadImageList() async {
-    final directory = await getApplicationDocumentsDirectory();
+    var directory = await getApplicationDocumentsDirectory();
+    directory = Directory('${directory.path}/enhanced/');
     return directory.listSync().where((item) => item.path.endsWith('.jpg')).toList();
   }
 
@@ -38,16 +39,10 @@ class DefaultPageState extends State<DefaultPage> {
     if (!mounted) return;
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => LoadingPage(imagePath: selectedImage!)),
+      MaterialPageRoute(builder: (context) => LoadingPage(image: selectedImage!, flag: 0)),
     );
 
     await _uploadImage(selectedImage!);
-
-    
-    if (mounted) {
-      Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
-    }
   }
 
   Future<void> _uploadImage(File image) async {
@@ -72,11 +67,42 @@ class DefaultPageState extends State<DefaultPage> {
         debugPrint('Image uploaded successfully');
 
         final tempDir = await getApplicationDocumentsDirectory();
-        final path = '${tempDir.path}/$imageName.jpg';
-        final tempFile = File(path);
-        debugPrint(tempDir.path);
-        await tempFile.writeAsBytes(response.bodyBytes);
-        enhancedImage = File(path);
+        final enhancedDir = Directory('${tempDir.path}/enhanced/');
+        final enhancedPath = '${tempDir.path}/enhanced/$imageName.jpg';
+        if(await enhancedDir.exists())
+        { 
+          final enhancedFile = File(enhancedPath);
+          await enhancedFile.writeAsBytes(response.bodyBytes);
+          enhancedImage = File(enhancedPath); 
+        }
+        else
+        {
+          await enhancedDir.create(recursive: true);
+          final enhancedFile = File(enhancedPath);
+          await enhancedFile.writeAsBytes(response.bodyBytes);
+          enhancedImage = File(enhancedPath);
+        }
+        final originalDir = Directory('${tempDir.path}/original/');
+        final originalPath = '${tempDir.path}/original/$imageName.jpg';
+        final bytes = await selectedImage!.readAsBytes();
+        if(await originalDir.exists())
+        { 
+          File originalFile = File(originalPath);
+          await originalFile.writeAsBytes(bytes);
+        }
+        else
+        {
+          await originalDir.create(recursive: true);
+          File originalFile = File(originalPath);
+          await originalFile.writeAsBytes(bytes);
+        }
+        
+        if (mounted) {
+          Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
+          Navigator.push(
+            context, MaterialPageRoute(builder: (context) => LoadingPage(image: enhancedImage!, flag: 1)),
+          );
+        }
       } else {
         debugPrint('Image upload failed with status code ${response.statusCode}');
       }
@@ -95,6 +121,47 @@ class DefaultPageState extends State<DefaultPage> {
             fontFamily: 'Monospace'
           )),
         backgroundColor: const Color.fromARGB(255, 12, 12, 12)
+      ),
+      drawer: Drawer(
+        width: 300.0,
+        backgroundColor: const Color.fromARGB(255, 12, 12, 12),
+        surfaceTintColor: const Color.fromARGB(255, 67, 148, 148),
+        elevation: 100.0,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 12, 12, 12),
+              ),
+              child: Image(image: AssetImage('assets/images/splash.jpg')),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home_rounded),
+              title: const Text('Home'),
+              onTap: () => {
+                const DefaultPage(),
+                Navigator.pop(context)
+              }
+            ),
+            ListTile(
+              leading: const Icon(Icons.collections_rounded),
+              title: const Text('Files'),
+              onTap: () => {
+                _pickImage(ImageSource.gallery),
+                Navigator.pop(context)
+              }
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: const Text('Camera'),
+              onTap: () => {
+                _pickImage(ImageSource.camera),
+                Navigator.pop(context)
+              }
+            )
+          ]
+        )
       ),
       body: FutureBuilder<List<FileSystemEntity>>(
         future: _imageListFuture,
@@ -145,32 +212,6 @@ class DefaultPageState extends State<DefaultPage> {
             );
           }
         },
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(255, 12, 12, 12),
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 6.0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.home_rounded),
-                onPressed: () => const DefaultPage(),
-              ),
-              IconButton(
-                icon: const Icon(Icons.collections_rounded),
-                onPressed: () => _pickImage(ImageSource.gallery),
-              ),
-              IconButton(
-                icon: const Icon(Icons.photo_camera),
-                onPressed: () => _pickImage(ImageSource.camera),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
