@@ -46,7 +46,7 @@ class DefaultPageState extends State<DefaultPage> {
   }
 
   Future<void> _uploadImage(File image) async {
-    String uploadUrl = 'http://172.16.128.103:5050/upload';
+    String uploadUrl = 'http://10.0.2.2:5000/upload';
 
     final mimeTypeData = lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
 
@@ -113,7 +113,9 @@ class DefaultPageState extends State<DefaultPage> {
 
   @override
   Widget build(BuildContext context) {
-    setState(() {});
+    setState(() {
+      _imageListFuture = _loadImageList();
+    });
     return Scaffold(
       appBar: AppBar(
         title: const Text("WorkBoard",

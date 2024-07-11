@@ -5,7 +5,7 @@ const child_process = require('child_process');
 
 const app = express();
 
-app.listen(5050, '0.0.0.0', () => {
+app.listen(5000, '0.0.0.0', () => {
     console.log(`Server is running on http://0.0.0.0`);
   });
 
@@ -35,7 +35,7 @@ app.post('/upload', upload.single("image"), (req, res) => {
     const inputPath = path.join(__dirname, 'uploads', req.file.filename);
     const outputPath = path.join(__dirname, 'processed_images', `processed-${req.file.filename}`);
     const file_path=path.join(__dirname,'..//ml_model//main.py');
-    const pythonProcess = child_process.spawn('python3', [
+    const pythonProcess = child_process.spawn('python', [
         file_path,
         inputPath,
         outputPath,

@@ -1,5 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 import 'dart:io';
+// import 'dart:typed_data';
 import 'package:demo/default_page.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
@@ -35,13 +36,20 @@ class _ImageDisplayState extends State<ImageDisplay> {
     File originalFile = File(paths[0]);
     File enhancedFile = File(paths[1]);
 
+    File file1, file2;
+    var bytesOriginal = originalFile.readAsBytesSync(); 
+    var bytesEnhanced = enhancedFile.readAsBytesSync();
     final snackBar = SnackBar(
       content: const Text('Image Deleted!'),
       action: SnackBarAction(
         label: 'Undo',
-        onPressed: () => {
-          Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst)),
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DefaultPage()))
+        onPressed: () {
+          file1 = File(paths[0]);
+          file1.writeAsBytes(bytesOriginal);
+          file2 = File(paths[1]);
+          file2.writeAsBytes(bytesEnhanced);
+          Navigator.pop(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
         }));
     return Scaffold(
       appBar: AppBar(
@@ -122,7 +130,8 @@ class _ImageDisplayState extends State<ImageDisplay> {
                       ]
                     ),
                     onTap: () {
-                      File(widget.image_path).delete();
+                      originalFile.delete();
+                      enhancedFile.delete();
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
