@@ -39,7 +39,7 @@ app.post('/upload', upload.single("image"), (req, res) => {
         file_path,
         inputPath,
         outputPath,
-        'W3qPqcMolWonRsfEjphV'  // Pass the API key as an argument
+        'Api key'  // Pass the API key as an argument
     ]);
 
     pythonProcess.stdout.on('data', (data) => {
