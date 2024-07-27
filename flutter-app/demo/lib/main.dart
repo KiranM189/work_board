@@ -1,4 +1,4 @@
-import 'package:demo/default_page.dart';
+import 'package:demo/scan.dart';
 import 'package:flutter/material.dart';
 // import 'package:demo/on_board_page.dart';
 
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(useMaterial3: true, colorScheme: const ColorScheme.dark(brightness: Brightness.dark)),
-      home: DefaultPage(),
+      home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
