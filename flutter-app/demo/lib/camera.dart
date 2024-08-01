@@ -73,7 +73,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
               ),
             ),
           ),
-          /*FloatingActionButton(
+          FloatingActionButton(
             onPressed: () async {
             try {
               await _initializeControllerFuture;
@@ -91,7 +91,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           }
         },
         child: const Icon(Icons.camera_alt),),
-        */
         ]
       )
     );
