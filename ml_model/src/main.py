@@ -1,10 +1,54 @@
 from inference import get_model
-import sys
+from datetime import datetime
+from flask import Flask, request, send_file, jsonify
 import image_enhancer
+import os
 import cv2
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 from  PIL import Image
 import numpy as np
+from io import BytesIO
+
+app = Flask(__name__)
+
+# Ensure the 'uploads' directory exists
+UPLOAD_FOLDER = 'uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+@app.route('/upload', methods=['POST'])
+def process_image():
+    if 'image' not in request.files:
+        return jsonify(error='No file uploaded'), 400
+
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify(error='No file selected'), 400
+
+    try:
+        curr_date_time = datetime.now().strftime("%Y%m%d%H%M%S")
+        input_filename = f"{curr_date_time}_{file.filename}"
+        input_path = os.path.join(UPLOAD_FOLDER, input_filename)
+        file.save(input_path)
+
+        output_filename = f"processed_{input_filename}"
+        output_path = os.path.join(UPLOAD_FOLDER, output_filename)
+        api_key='W3qPqcMolWonRsfEjphV'
+        print("Function called")
+        main(input_path,output_path,api_key) 
+
+        # Open the processed image from the output path and prepare it for sending
+        with Image.open(output_path) as output_image:
+            img_io = BytesIO()
+            output_image.save(img_io, 'PNG')
+            img_io.seek(0)
+
+        return send_file(img_io, mimetype='image/png', as_attachment=True, download_name=output_filename)
+    except Exception as e:
+        app.logger.error(f"Error processing image: {e}")
+        return jsonify(error='An error occurred while processing the image'), 500
+
+
 
 def main(input_path,output_path,api_key):
     processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
@@ -19,8 +63,7 @@ def main(input_path,output_path,api_key):
     circles = 0
     rectan = 0
     rhom = 0
-    # text=0
-    # gentext=" "
+
     white_color = (255, 255, 255)
     arrow=0
     for i in results[0].predictions:
@@ -178,12 +221,5 @@ def main(input_path,output_path,api_key):
     cv2.imwrite(output_path, enim)
     # print("circles : %3d \n rectangles : %3d \n rhombus : %3d \n text : %3d \n parallelogram : %3d" % (circles, rectan, rhom,para))
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python script.py <input_path> <output_path> <api_key>")
-        sys.exit(1)
-    
-    input_path = sys.argv[1]
-    output_path = sys.argv[2]
-    api_key = sys.argv[3]
-
-    main(input_path, output_path, api_key)
+    print("Listening on port 5000")
+    app.run(host='0.0.0.0',debug=True,port=5000)

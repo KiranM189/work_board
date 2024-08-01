@@ -1,0 +1,6 @@
+inference
+Flask
+opencv-python
+transformers
+Pillow
+numpy
