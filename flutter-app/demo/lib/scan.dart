@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       "WorkBoard",
                       style: GoogleFonts.grandHotel(
                         color: const Color.fromARGB(255, 32, 4, 248),
-                        fontSize: 50.0,
+                        fontSize: 40.0,
                         fontWeight: FontWeight.bold
                       ),
                     ),
@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         'from scribbles to pixels.....',
                         style: GoogleFonts.poppins(
                           color: Colors.white,
-                          fontSize: 18.0,
+                          fontSize: 14.0,
                           fontWeight: FontWeight.w300,
                           fontStyle: FontStyle.italic
                         ),
@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: const TextStyle(
                                 color: Color.fromARGB(255, 32, 4, 248),
                                 fontFamily: 'Monospace',
-                                fontSize: 36.0,
+                                fontSize: 32.0,
                                 fontWeight: FontWeight.bold
                               )
                             ),
@@ -123,14 +123,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: const TextStyle(
                                       color: Color.fromARGB(255, 32, 4, 248),
                                       fontFamily: 'Poppins',
-                                      fontSize: 20.0,
+                                      fontSize: 18.0,
                                       fontWeight: FontWeight.w400
                                     )
                                   )
                                 ),
                                 Container(
                                   padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height / 80, horizontal: MediaQuery.of(context).size.width / 40),
-                                  child: Image(image: AssetImage(imagePath[i]), width: 80.0, height: 80.0)
+                                  child: Image(image: AssetImage(imagePath[i]), width: 75.0, height: 75.0)
                                 )
                               ]
                             )

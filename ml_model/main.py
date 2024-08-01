@@ -2,13 +2,13 @@ from inference import get_model
 import sys
 import image_enhancer
 import cv2
-# from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 from  PIL import Image
 import numpy as np
 
 def main(input_path,output_path,api_key):
-    # processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
-    # model123 = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")
+    processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
+    model123 = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")
 
     model = get_model(model_id="handwrittenv2/2", api_key=api_key)
     imgg = cv2.imread(input_path)
@@ -130,54 +130,53 @@ def main(input_path,output_path,api_key):
             cv2.line(enim,(x2,y),(x,y2),(0,0,0),2)
             rhom += 1
         
-    # for i in results[0].predictions:
-    #     if i.class_name == "text":
-    #         center_x, center_y = int(i.x), int(i.y)  # Center coordinates
-    #         width, height = int(i.width), int(i.height)
-    #         top_left_x = center_x - width // 2
-    #         top_left_y = center_y - height // 2
-    #         bottom_right_x = center_x + width // 2
-    #         bottom_right_y = center_y + height // 2
-    #         cropped_image = imgg[top_left_y:bottom_right_y, top_left_x:bottom_right_x]
-    #         image_rgb = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB)
+    for i in results[0].predictions:
+        if i.class_name == "text":
+            center_x, center_y = int(i.x), int(i.y)  # Center coordinates
+            width, height = int(i.width), int(i.height)
+            top_left_x = center_x - width // 2
+            top_left_y = center_y - height // 2
+            bottom_right_x = center_x + width // 2
+            bottom_right_y = center_y + height // 2
+            cropped_image = imgg[top_left_y:bottom_right_y, top_left_x:bottom_right_x]
+            image_rgb = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB)
 
-    #         # Convert the OpenCV image to a PIL image
-    #         image_pil = Image.fromarray(image_rgb)
+            # Convert the OpenCV image to a PIL image
+            image_pil = Image.fromarray(image_rgb)
 
-    #         # Tokenize the image using the TrOCR processor
-    #         pixel_values = processor(image_pil, return_tensors="pt").pixel_values
+            # Tokenize the image using the TrOCR processor
+            pixel_values = processor(image_pil, return_tensors="pt").pixel_values
 
-    #         # Generate text from the pixel values
-    #         generated_ids = model123.generate(pixel_values)
-    #         generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
-    #         #font = cv2.FONT_HERSHEY_SCRIPT_SIMPLEX
-    #         font = cv2.FONT_HERSHEY_SIMPLEX
-    #         thickness = 2
-    #         x = center_x - width // 2
-    #         y = center_y - height // 2
+            # Generate text from the pixel values
+            generated_ids = model123.generate(pixel_values)
+            generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
+            #font = cv2.FONT_HERSHEY_SCRIPT_SIMPLEX
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            thickness = 2
+            x = center_x - width // 2
+            y = center_y - height // 2
 
-    # # Calculate the font scale based on the rectangle size and text length
-    #         font_scale = min(width, height) / 10  # Adjust this factor as needed
+    # Calculate the font scale based on the rectangle size and text length
+            font_scale = min(width, height) / 10  # Adjust this factor as needed
 
-    # # Calculate the text size to check if it fits into the rectangle
-    #         (text_width, text_height), _ = cv2.getTextSize(generated_text, font, font_scale, thickness)
+    # Calculate the text size to check if it fits into the rectangle
+            (text_width, text_height), _ = cv2.getTextSize(generated_text, font, font_scale, thickness)
 
-    # # Adjust font scale to fit text into the rectangle
-    #         while text_width > width or text_height > height:
-    #             font_scale -= 0.05
-    #             (text_width, text_height), _ = cv2.getTextSize(generated_text, font, font_scale, thickness)
+    # Adjust font scale to fit text into the rectangle
+            while text_width > width or text_height > height:
+                font_scale -= 0.05
+                (text_width, text_height), _ = cv2.getTextSize(generated_text, font, font_scale, thickness)
 
-    # # Calculate text position to center it in the rectangle
-    #         text_x = x + (width - text_width) // 2
-    #         text_y = y + (height + text_height) // 2
+    # Calculate text position to center it in the rectangle
+            text_x = x + (width - text_width) // 2
+            text_y = y + (height + text_height) // 2
 
-    # # Draw the rectangle and text on the image
-    #         cv2.rectangle(enim, (x, y), (x + width, y + height), (249,249,249),-1)  # White rectangle border
-    #         cv2.putText(enim,generated_text, (text_x, text_y), font, font_scale, (0,0,0), thickness)
-    #         print(generated_text)
-    #         text+=1
+    # Draw the rectangle and text on the image
+            cv2.rectangle(enim, (x, y), (x + width, y + height), (249,249,249),-1)  # White rectangle border
+            cv2.putText(enim,generated_text, (text_x, text_y), font, font_scale, (0,0,0), thickness)
+            print(generated_text)
     cv2.imwrite(output_path, enim)
-    # print("circles : %3d \n rectangles : %3d \n rhombus : %3d \n text : %3d \n parallelogram : %3d" % (circles, rectan, rhom,text,para))
+    # print("circles : %3d \n rectangles : %3d \n rhombus : %3d \n text : %3d \n parallelogram : %3d" % (circles, rectan, rhom,para))
 if __name__ == "__main__":
     if len(sys.argv) != 4:
         print("Usage: python script.py <input_path> <output_path> <api_key>")

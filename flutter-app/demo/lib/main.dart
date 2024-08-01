@@ -1,5 +1,6 @@
 import 'package:demo/scan.dart';
 import 'package:flutter/material.dart';
+// import 'package:demo/on_board_page.dart';
 
 void main(){
   runApp(const MyApp());
