@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:demo/camera.dart';
 import 'package:camera/camera.dart';
@@ -39,14 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    "Chalk",
-                    style: GoogleFonts.grandHotel(
-                      color: Colors.white,
-                      fontSize: 50.0,
-                      fontWeight: FontWeight.bold
-                    ),
-                  ),
+                  const Image(image: AssetImage('assets/images/logo.png')),
                   Center(
                     child: Text(
                       'from scribbles to pixels.....',
