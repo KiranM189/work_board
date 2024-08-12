@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:camera/camera.dart';
+import 'package:demo/gallery.dart';
 import 'package:flutter/material.dart';
 
 // A screen that allows users to take a picture using a given camera.
@@ -20,6 +21,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   bool isFlashOn = false;
+  int state = 0;
 
   @override
   void initState() {
@@ -44,6 +46,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     super.dispose();
   }
 
+  void set(DragUpdateDetails details) {
+    setState(() {
+      state = 1 - state;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,10 +70,10 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             },
           ),
           Positioned.fill(
-            left: MediaQuery.of(context).size.width / 4,
-            right: MediaQuery.of(context).size.width / 4,
-            top: MediaQuery.of(context).size.height / 4,
-            bottom: MediaQuery.of(context).size.height / 4,
+            left: MediaQuery.of(context).size.width / 6,
+            right: MediaQuery.of(context).size.width / 6,
+            top: MediaQuery.of(context).size.height / 2 - MediaQuery.of(context).size.width / 3,
+            bottom: MediaQuery.of(context).size.height / 2 - MediaQuery.of(context).size.width / 3,
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(
@@ -76,9 +83,29 @@ class TakePictureScreenState extends State<TakePictureScreen> {
               ),
             ),
           ),
+          Container(
+            alignment: Alignment.topCenter,
+            padding: const EdgeInsets.only(top: 30.0),
+            child: const Text('Chalk',
+              style: TextStyle(
+                fontFamily: 'Monospace',
+                color: Colors.white,
+                fontSize: 24.0
+              ),
+            ),
+          ),
           Positioned.fill(
-            right: MediaQuery.of(context).size.width - 175,
+            top: MediaQuery.of(context).size.height - 100,
+            right: MediaQuery.of(context).size.width - 100,
+            child: IconButton(
+                  icon: const Icon(Icons.collections, size: 50.0),
+                  color: Colors.white,
+                  onPressed: () => { Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Gallery())) }
+                ),
+          ),
+          Positioned.fill(
             bottom: MediaQuery.of(context).size.height - 100,
+            right: MediaQuery.of(context).size.width - 175,
             child: Row(
               children: [
                 IconButton(
@@ -95,10 +122,22 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                       isFlashOn = !isFlashOn;
                     })
                   }
-                )
+                ),
               ]
             )
           ),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
+            height: state == 0 ? MediaQuery.of(context).size.height: 0,
+            child: GestureDetector(
+              onVerticalDragUpdate: set,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                child: state == 0 ?  Container(): const Gallery()
+              )
+
+            )
+          )
         ]
       ),
       floatingActionButton: FloatingActionButton(
