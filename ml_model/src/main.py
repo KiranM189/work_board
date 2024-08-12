@@ -33,7 +33,7 @@ def process_image():
 
         output_filename = f"processed_{input_filename}"
         output_path = os.path.join(UPLOAD_FOLDER, output_filename)
-        api_key='W3qPqcMolWonRsfEjphV'
+        api_key='your api key'
         print("Function called")
         main(input_path,output_path,api_key) 
 

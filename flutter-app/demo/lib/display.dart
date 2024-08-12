@@ -51,115 +51,123 @@ class _ImageDisplayState extends State<ImageDisplay> {
           Navigator.pop(context);
           Navigator.push(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
         }));
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.image_path.split('/').last.split('.').first,
-          style: const TextStyle(
-            fontFamily: 'Monospace',
-            fontSize: 16.0
-          )
-        ),
-        backgroundColor: const Color.fromARGB(255, 12, 12, 12),
-        actions: [
-          PopupMenuButton<int>(
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 1,
-                    child: const Row(
-                      children: [
-                        Icon(Icons.share),
-                        SizedBox(
-                          width: 10
-                        ),
-                        Text("Share")
-                      ]
-                    ),
-                    onTap: ()=> {Share.shareXFiles([XFile(paths[select])])},
-                  ),
-                  PopupMenuItem(
-                    value: 2,
-                    child: const Row(
-                      children: [
-                        Icon(Icons.edit),
-                        SizedBox(
-                          width: 10
-                        ),
-                        Text("Rename")
-                      ]
-                    ),
-                    onTap: () => {
-                      showDialog<String>(
-                        context: context,
-                        builder: (BuildContext context) => AlertDialog(
-                          title: const Text('Rename the file'),
-                            content: TextField(
-                              controller: widget.rename_text,
-                            ),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, 'Cancel'),
-                              child: const Text('CANCEL'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                String rename_dir="${p.dirname(paths[1])}/${widget.rename_text.text}.jpg";
-                                enhancedFile.rename(rename_dir);
-                                debugPrint(rename_dir);
-                                rename_dir="${p.dirname(paths[0])}/${widget.rename_text.text}.jpg";
-                                originalFile.rename(rename_dir);
-                                debugPrint(rename_dir);
-                                Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
-                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    },
-                  ),
-                  PopupMenuItem(
-                    value: 3,
-                    child: const Row(
-                      children: [
-                        Icon(Icons.delete),
-                        SizedBox(
-                          width: 10
-                        ),
-                        Text("Delete")
-                      ]
-                    ),
-                    onTap: () {
-                      originalFile.delete();
-                      enhancedFile.delete();
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
-                    },
-                  )
-                ]
-              ),
-        ]
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/background_image.jpg'),
+          fit: BoxFit.cover
+        )
       ),
-      body: Center(child: Image.file(File(paths[select]))),
-      bottomNavigationBar: SegmentedButton<int>(
-        segments: const[
-          ButtonSegment(
-            value: 0,
-            label: Text('Original')
+      child:Scaffold(
+        appBar: AppBar(
+          title: Text(widget.image_path.split('/').last.split('.').first,
+            style: const TextStyle(
+              fontFamily: 'Monospace',
+              fontSize: 16.0
+            )
           ),
-          ButtonSegment(
-            value: 1,
-            label: Text('Enhanced')
-          )
-        ],
-        selected: {select},
-        onSelectionChanged: (selection) {
-          setState(() => 
-            select = selection.first
-          );
-        },
-      ),
+          backgroundColor: const Color.fromARGB(255, 12, 12, 12),
+          actions: [
+            PopupMenuButton<int>(
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 1,
+                      child: const Row(
+                        children: [
+                          Icon(Icons.share),
+                          SizedBox(
+                            width: 10
+                          ),
+                          Text("Share")
+                        ]
+                      ),
+                      onTap: ()=> {Share.shareXFiles([XFile(paths[select])])},
+                    ),
+                    PopupMenuItem(
+                      value: 2,
+                      child: const Row(
+                        children: [
+                          Icon(Icons.edit),
+                          SizedBox(
+                            width: 10
+                          ),
+                          Text("Rename")
+                        ]
+                      ),
+                      onTap: () => {
+                        showDialog<String>(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: const Text('Rename the file'),
+                              content: TextField(
+                                controller: widget.rename_text,
+                              ),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, 'Cancel'),
+                                child: const Text('CANCEL'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  String rename_dir="${p.dirname(paths[1])}/${widget.rename_text.text}.jpg";
+                                  enhancedFile.rename(rename_dir);
+                                  debugPrint(rename_dir);
+                                  rename_dir="${p.dirname(paths[0])}/${widget.rename_text.text}.jpg";
+                                  originalFile.rename(rename_dir);
+                                  debugPrint(rename_dir);
+                                  Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
+                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      },
+                    ),
+                    PopupMenuItem(
+                      value: 3,
+                      child: const Row(
+                        children: [
+                          Icon(Icons.delete),
+                          SizedBox(
+                            width: 10
+                          ),
+                          Text("Delete")
+                        ]
+                      ),
+                      onTap: () {
+                        originalFile.delete();
+                        enhancedFile.delete();
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
+                      },
+                    )
+                  ]
+                ),
+          ]
+        ),
+        body: Center(child: Image.file(File(paths[select]))),
+        bottomNavigationBar: SegmentedButton<int>(
+          segments: const[
+            ButtonSegment(
+              value: 0,
+              label: Text('Original')
+            ),
+            ButtonSegment(
+              value: 1,
+              label: Text('Enhanced')
+            )
+          ],
+          selected: {select},
+          onSelectionChanged: (selection) {
+            setState(() => 
+              select = selection.first
+            );
+          },
+        ),
+      )
     );
   }
 }
