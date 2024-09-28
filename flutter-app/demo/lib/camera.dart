@@ -2,7 +2,12 @@ import 'dart:async';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:demo/gallery.dart';
+import 'package:demo/upload.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
+import 'package:path_provider/path_provider.dart';
 
 // A screen that allows users to take a picture using a given camera.
 class TakePictureScreen extends StatefulWidget {
@@ -20,6 +25,8 @@ class TakePictureScreen extends StatefulWidget {
 class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
+  late File? selectedImage;
+  late File? enhancedImage;
   bool isFlashOn = false;
   int state = 0;
 
@@ -51,11 +58,89 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       state = 1 - state;
     });
   }
+
+  Future<void> _uploadImage(File image) async {
+    String uploadUrl = 'http://10.20.203.158:5000/upload';
+
+    final mimeTypeData = lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
+
+    final imageUploadRequest = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+    final file = await http.MultipartFile.fromPath(
+      'image',
+      image.path,
+      contentType: MediaType(mimeTypeData![0], mimeTypeData[1]), // Use MediaType from http_parser
+    );
+    String imageName = image.path.split('/').last;
+
+    imageUploadRequest.files.add(file);
+
+    try {
+      final streamedResponse = await imageUploadRequest.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode == 200) {
+        debugPrint('Image uploaded successfully');
+
+        final tempDir = await getApplicationDocumentsDirectory();
+        final enhancedDir = Directory('${tempDir.path}/enhanced/');
+        final enhancedPath = '${tempDir.path}/enhanced/$imageName.jpg';
+        if(await enhancedDir.exists())
+        { 
+          final enhancedFile = File(enhancedPath);
+          await enhancedFile.writeAsBytes(response.bodyBytes);
+          enhancedImage = File(enhancedPath); 
+        }
+        else
+        {
+          await enhancedDir.create(recursive: true);
+          final enhancedFile = File(enhancedPath);
+          await enhancedFile.writeAsBytes(response.bodyBytes);
+          enhancedImage = File(enhancedPath);
+        }
+        final originalDir = Directory('${tempDir.path}/original/');
+        final originalPath = '${tempDir.path}/original/$imageName.jpg';
+        final bytes = await selectedImage!.readAsBytes();
+        if(await originalDir.exists())
+        { 
+          File originalFile = File(originalPath);
+          await originalFile.writeAsBytes(bytes);
+        }
+        else
+        {
+          await originalDir.create(recursive: true);
+          File originalFile = File(originalPath);
+          await originalFile.writeAsBytes(bytes);
+        }
+        
+        if (mounted) {
+          Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
+          Navigator.push(
+            context, MaterialPageRoute(builder: (context) => LoadingPage(image: enhancedImage!, flag: 1)),
+          );
+        }
+      } else {
+        debugPrint('Image upload failed with status code ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error uploading image: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
+            height: state == 0 ? MediaQuery.of(context).size.height: 0,
+            child: GestureDetector(
+              onVerticalDragUpdate: set,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                child: state == 0 ?  Container(): const Gallery()
+              )
+            )
+          ),
           FutureBuilder<void>(
             future: _initializeControllerFuture,
             builder: (context, snapshot) {
@@ -126,18 +211,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
               ]
             )
           ),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 500),
-            height: state == 0 ? MediaQuery.of(context).size.height: 0,
-            child: GestureDetector(
-              onVerticalDragUpdate: set,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                child: state == 0 ?  Container(): const Gallery()
-              )
-
-            )
-          )
+          
         ]
       ),
       floatingActionButton: FloatingActionButton(
@@ -148,13 +222,15 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             await _initializeControllerFuture;
             final image = await _controller.takePicture();
             if (!context.mounted) return;
-            await Navigator.of(context).push(
+            Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  imagePath: image.path,
+                builder: (context) => LoadingPage(
+                  image: File(image.path),
+                  flag: 0,
                 ),
               ),
             );
+            await _uploadImage(File(image.path));
           } 
           catch (e) {
             debugPrint('Error');
@@ -162,22 +238,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         }
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
-    );
-  }
-}
-
-// A widget that displays the picture taken by the user.
-class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
-
-  const DisplayPictureScreen({super.key, required this.imagePath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
     );
   }
 }

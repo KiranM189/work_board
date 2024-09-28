@@ -67,39 +67,6 @@ def main(input_path,output_path,api_key):
     white_color = (255, 255, 255)
     arrow=0
     for i in results[0].predictions:
-        if i.class_name == "head000":
-            arrow+=1
-            center_x, center_y = int(i.x), int(i.y)  # Center coordinates
-            width, height = int(i.width), int(i.height)
-
-            # Calculate the corners of the rhombus
-            x1 = int(center_x - (width-30) / 2)
-            x2 = int(center_x + (width-30)/ 2)
-            y1 = int(center_y - (height-30) / 2)
-            y2 = int(center_y + (height-30) / 2)
-
-            # Points of the rhombus
-            points = np.array([
-            [center_x, y1],  # Top point
-            [x2, center_y],  # Right point
-            [center_x, y2],  # Bottom point
-            [x1, center_y]   # Left point
-            ], np.int32)
-            points = points.reshape((-1, 1, 2))
-
-            # Draw and fill the rectangle
-            top_left_x = center_x - width // 2
-            top_left_y = center_y - height // 2
-            bottom_right_x = center_x + width // 2
-            bottom_right_y = center_y + height // 2
-            cv2.rectangle(enim, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), white_color, thickness=-1)
-
-            # Fill the rhombus with black
-            cv2.fillPoly(enim, [points], color=(0, 0, 0))
-
-            # Draw the edges of the rhombus (optional, for better visualization)
-            cv2.polylines(enim, [points], isClosed=True, color=(0, 0, 0), thickness=2)
-
         if i.class_name == "oval" or i.class_name == "circle":
             center_x, center_y = int(i.x), int(i.y)  # Center coordinates
             width, height = int(i.width), int(i.height)  # Width and height of the ellipse
@@ -173,7 +140,6 @@ def main(input_path,output_path,api_key):
             cv2.line(enim,(x2,y),(x,y2),(0,0,0),2)
             rhom += 1
         
-    for i in results[0].predictions:
         if i.class_name == "text":
             center_x, center_y = int(i.x), int(i.y)  # Center coordinates
             width, height = int(i.width), int(i.height)
