@@ -45,8 +45,8 @@ class DefaultPageState extends State<DefaultPage> {
     await _uploadImage(selectedImage!);
   }
 
-  Future<void> _uploadImage(File image) async {
-    String uploadUrl = 'http://10.0.2.2:5000/upload';
+  Future<void> _uploadImage(File image) async { 
+    String uploadUrl = 'http://10.10.3.132:5000/upload';
 
     final mimeTypeData = lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
 

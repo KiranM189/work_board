@@ -4,3 +4,5 @@ opencv-python
 transformers
 Pillow
 numpy
+timm 
+flash_attn

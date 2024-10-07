@@ -3,7 +3,7 @@ from PIL import Image
 import torch
 # %matplotlib inline
 
-def run_example(task_prompt, path):
+def run(task_prompt, path):
     model_id = 'microsoft/Florence-2-large'
     model2 = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True, torch_dtype='auto').eval().cuda()
     processor2 = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)

@@ -3,7 +3,7 @@ from flask import Flask, request, send_file, jsonify
 import os
 from PIL import Image
 from io import BytesIO
-import florence
+# import florence
 import shapes_and_text
 
 app=Flask(__name__)
@@ -34,9 +34,8 @@ def process_image():
         
         api_key='W3qPqcMolWonRsfEjphV'
         shapes_and_text.run(input_path, output_path, api_key)
-        
         task_prompt='<MORE_DETAILED_CAPTION>'
-        analysis=florence.run_exapmle(task_prompt, input_path)
+        # analysis=florence.run(task_prompt, input_path)
 
         with Image.open(output_path) as output_image:
             img_io=BytesIO()
@@ -52,7 +51,7 @@ def process_image():
         )
 
         # Add custom headers
-        response.headers['Analysis']=analysis
+        response.headers['Analysis']="ABCD"
         return response
 
     except Exception as e:

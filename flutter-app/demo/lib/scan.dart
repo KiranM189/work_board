@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       'from scribbles to pixels.....',
                       style: GoogleFonts.poppins(
                         color: Colors.white,
-                        fontSize: 14.0,
+                        fontSize: 10.0,
                         fontWeight: FontWeight.w300,
                         fontStyle: FontStyle.italic
                       ),
