@@ -44,7 +44,7 @@ def process_image():
             img_io.seek(0)
         os.remove(input_path)
         os.remove(output_path)
-        response = send_file(
+        response=send_file(
             img_io,
             mimetype='image/png',
             as_attachment=True,
@@ -52,7 +52,7 @@ def process_image():
         )
 
         # Add custom headers
-        response.headers['Analysis'] = analysis
+        response.headers['Analysis']=analysis
         return response
 
     except Exception as e:
