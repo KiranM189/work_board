@@ -1,12 +1,10 @@
 import 'dart:io';
 import 'package:demo/display.dart';
-import 'package:demo/upload.dart';
+// import 'package:demo/upload.dart';
 import 'package:flutter/material.dart';
-import 'package:http_parser/http_parser.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:mime/mime.dart';
+// import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:http/http.dart' as http;
+
 
 class DefaultPage extends StatefulWidget {
   const DefaultPage({super.key});
@@ -32,7 +30,7 @@ class DefaultPageState extends State<DefaultPage> {
     return directory.listSync().where((item) => item.path.endsWith('.jpg')).toList();
   }
 
-  Future<void> _pickImage(ImageSource src) async {
+  /*Future<void> _pickImage(ImageSource src) async {
     final returnedImage = await ImagePicker().pickImage(source: src);
     if (returnedImage == null) return;
     selectedImage = File(returnedImage.path);
@@ -41,75 +39,9 @@ class DefaultPageState extends State<DefaultPage> {
       context,
       MaterialPageRoute(builder: (context) => LoadingPage(image: selectedImage!, flag: 0)),
     );
+  }*/
 
-    await _uploadImage(selectedImage!);
-  }
-
-  Future<void> _uploadImage(File image) async { 
-    String uploadUrl = 'http://10.10.3.132:5000/upload';
-
-    final mimeTypeData = lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
-
-    final imageUploadRequest = http.MultipartRequest('POST', Uri.parse(uploadUrl));
-    final file = await http.MultipartFile.fromPath(
-      'image',
-      image.path,
-      contentType: MediaType(mimeTypeData![0], mimeTypeData[1]), // Use MediaType from http_parser
-    );
-    String imageName = image.path.split('/').last;
-
-    imageUploadRequest.files.add(file);
-
-    try {
-      final streamedResponse = await imageUploadRequest.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      if (response.statusCode == 200) {
-        debugPrint('Image uploaded successfully');
-
-        final tempDir = await getApplicationDocumentsDirectory();
-        final enhancedDir = Directory('${tempDir.path}/enhanced/');
-        final enhancedPath = '${tempDir.path}/enhanced/$imageName.jpg';
-        if(await enhancedDir.exists())
-        { 
-          final enhancedFile = File(enhancedPath);
-          await enhancedFile.writeAsBytes(response.bodyBytes);
-          enhancedImage = File(enhancedPath); 
-        }
-        else
-        {
-          await enhancedDir.create(recursive: true);
-          final enhancedFile = File(enhancedPath);
-          await enhancedFile.writeAsBytes(response.bodyBytes);
-          enhancedImage = File(enhancedPath);
-        }
-        final originalDir = Directory('${tempDir.path}/original/');
-        final originalPath = '${tempDir.path}/original/$imageName.jpg';
-        final bytes = await selectedImage!.readAsBytes();
-        if(await originalDir.exists())
-        { 
-          File originalFile = File(originalPath);
-          await originalFile.writeAsBytes(bytes);
-        }
-        else
-        {
-          await originalDir.create(recursive: true);
-          File originalFile = File(originalPath);
-          await originalFile.writeAsBytes(bytes);
-        }
-        
-        if (mounted) {
-          Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
-          Navigator.push(
-            context, MaterialPageRoute(builder: (context) => LoadingPage(image: enhancedImage!, flag: 1)),
-          );
-        }
-      } else {
-        debugPrint('Image upload failed with status code ${response.statusCode}');
-      }
-    } catch (e) {
-      debugPrint('Error uploading image: $e');
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +51,7 @@ class DefaultPageState extends State<DefaultPage> {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/background_image.jpg'),
+          image: AssetImage('assets/images/background.png'),
           fit: BoxFit.cover
         )
       ),
@@ -129,9 +61,8 @@ class DefaultPageState extends State<DefaultPage> {
             style: TextStyle(
               fontFamily: 'Monospace'
             )),
-          backgroundColor: const Color.fromARGB(255, 12, 12, 12)
         ),
-        drawer: Drawer(
+        /*drawer: Drawer(
           width: 300.0,
           backgroundColor: const Color.fromARGB(255, 12, 12, 12),
           surfaceTintColor: const Color.fromARGB(255, 67, 148, 148),
@@ -171,7 +102,7 @@ class DefaultPageState extends State<DefaultPage> {
               )
             ]
           )
-        ),
+        ),*/
         body: FutureBuilder<List<FileSystemEntity>>(
           future: _imageListFuture,
           builder: (context, snapshot) {

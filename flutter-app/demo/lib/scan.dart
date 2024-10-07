@@ -3,7 +3,6 @@ import 'package:demo/camera.dart';
 import 'package:camera/camera.dart';
 import 'package:demo/default_page.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,35 +23,13 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/background_image.jpg'),
+            image: AssetImage('assets/images/logo.png'),
             fit: BoxFit.cover
           )
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Container(
-              alignment: Alignment.topCenter,
-              padding: const EdgeInsets.fromLTRB(50.0, 100.0, 50.0, 20.0),
-              height: MediaQuery.of(context).size.height / 3,
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Image(image: AssetImage('assets/images/logo.png')),
-                  Center(
-                    child: Text(
-                      'from scribbles to pixels.....',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 10.0,
-                        fontWeight: FontWeight.w300,
-                        fontStyle: FontStyle.italic
-                      ),
-                    )
-                  ),
-                ],
-              )
-            ),
             CarouselSlider(
               options: CarouselOptions(
                 height: MediaQuery.of(context).size.height / 3,
@@ -162,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(50.0))
               ),
               padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 24),
-              margin: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width / 8, MediaQuery.of(context).size.height / 24, MediaQuery.of(context).size.width / 8, 0.0),
+              margin: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width / 8, MediaQuery.of(context).size.height / 24, MediaQuery.of(context).size.width / 8, MediaQuery.of(context).size.height / 24),
               child: GestureDetector(
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const DefaultPage()));
