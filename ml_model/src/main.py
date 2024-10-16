@@ -34,7 +34,7 @@ def process_image():
         
         api_key='W3qPqcMolWonRsfEjphV'
         shapes_and_text.run(input_path, output_path, api_key)
-        task_prompt='<MORE_DETAILED_CAPTION>'
+        # task_prompt='<MORE_DETAILED_CAPTION>'
         # analysis=florence.run(task_prompt, input_path)
 
         with Image.open(output_path) as output_image:

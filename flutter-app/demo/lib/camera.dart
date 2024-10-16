@@ -6,6 +6,7 @@ import 'package:demo/upload.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -119,9 +120,33 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         }
       } else {
         debugPrint('Image upload failed with status code ${response.statusCode}');
+        if (mounted) {
+          Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
+          const snackBar = SnackBar(
+            content: Text('Image processing unsuccessful!!! Try Again',
+              style: TextStyle(color: Colors.white)),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.black,
+            margin: EdgeInsets.only(bottom: 40, left: 20, right: 20)
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+        }
       }
     } catch (e) {
       debugPrint('Error uploading image: $e');
+      if (mounted) {
+          Navigator.popUntil(context, ((Route<dynamic> route) => route.isFirst));
+          const snackBar = SnackBar(
+            content: Text('Image processing unsuccessful!!! Try Again',
+              style: TextStyle(color: Colors.white)),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.black,
+            margin: EdgeInsets.only(bottom: 40, left: 20, right: 20)
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+        }
     }
   }
 
@@ -222,15 +247,18 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             await _initializeControllerFuture;
             final image = await _controller.takePicture();
             if (!context.mounted) return;
-            Navigator.of(context).push(
+            CroppedFile? cropped = await ImageCropper().cropImage(sourcePath: image.path);
+            /*Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => LoadingPage(
                   image: File(image.path),
                   flag: 0,
                 ),
               ),
-            );
-            await _uploadImage(File(image.path));
+            );*/
+            if(cropped != null) {
+              await _uploadImage(File(cropped.path));
+            }
           } 
           catch (e) {
             debugPrint('Error');

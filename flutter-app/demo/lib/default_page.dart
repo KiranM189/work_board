@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'package:demo/display.dart';
-// import 'package:demo/upload.dart';
 import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 
@@ -30,19 +28,6 @@ class DefaultPageState extends State<DefaultPage> {
     return directory.listSync().where((item) => item.path.endsWith('.jpg')).toList();
   }
 
-  /*Future<void> _pickImage(ImageSource src) async {
-    final returnedImage = await ImagePicker().pickImage(source: src);
-    if (returnedImage == null) return;
-    selectedImage = File(returnedImage.path);
-    if (!mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoadingPage(image: selectedImage!, flag: 0)),
-    );
-  }*/
-
-  
-
   @override
   Widget build(BuildContext context) {
     setState(() {
@@ -62,47 +47,6 @@ class DefaultPageState extends State<DefaultPage> {
               fontFamily: 'Monospace'
             )),
         ),
-        /*drawer: Drawer(
-          width: 300.0,
-          backgroundColor: const Color.fromARGB(255, 12, 12, 12),
-          surfaceTintColor: const Color.fromARGB(255, 67, 148, 148),
-          elevation: 100.0,
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 12, 12, 12),
-                ),
-                child: Image(image: AssetImage('assets/images/splash.jpg')),
-              ),
-              ListTile(
-                leading: const Icon(Icons.home_rounded),
-                title: const Text('Home'),
-                onTap: () => {
-                  const DefaultPage(),
-                  Navigator.pop(context)
-                }
-              ),
-              ListTile(
-                leading: const Icon(Icons.collections_rounded),
-                title: const Text('Files'),
-                onTap: () => {
-                  _pickImage(ImageSource.gallery),
-                  Navigator.pop(context)
-                }
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_camera),
-                title: const Text('Camera'),
-                onTap: () => {
-                  _pickImage(ImageSource.camera),
-                  Navigator.pop(context)
-                }
-              )
-            ]
-          )
-        ),*/
         body: FutureBuilder<List<FileSystemEntity>>(
           future: _imageListFuture,
           builder: (context, snapshot) {
