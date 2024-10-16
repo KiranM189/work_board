@@ -32,7 +32,7 @@ def process_image():
         output_filename=f"processed_{input_filename}"
         output_path=os.path.join(UPLOAD_FOLDER, output_filename)
         
-        api_key='W3qPqcMolWonRsfEjphV'
+        api_key='abcd'
         shapes_and_text.run(input_path, output_path, api_key)
         # task_prompt='<MORE_DETAILED_CAPTION>'
         # analysis=florence.run(task_prompt, input_path)
